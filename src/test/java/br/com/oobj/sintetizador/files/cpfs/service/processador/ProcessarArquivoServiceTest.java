@@ -20,8 +20,6 @@ import static org.junit.Assert.assertTrue;
 
 public class ProcessarArquivoServiceTest {
 
-    private File fileDiretorioTemporarioSistema;
-
     private String pathEntrada;
     private String pathSaida;
     private String pathSaidaArquivosMovidos;
@@ -32,7 +30,7 @@ public class ProcessarArquivoServiceTest {
 
     @Before
     public void setUp() throws IOException {
-        this.fileDiretorioTemporarioSistema = ParametrosTestesUtil.getFileDiretorioPadraoSistema();
+        File fileDiretorioTemporarioSistema = ParametrosTestesUtil.getFileDiretorioPadraoSistema();
 
         this.pathEntrada = fileDiretorioTemporarioSistema.getAbsolutePath() + "/entrada";
         this.pathSaida = fileDiretorioTemporarioSistema.getAbsolutePath() + "/saida";
@@ -67,8 +65,9 @@ public class ProcessarArquivoServiceTest {
         System.out.println("#TEST: deveEfetuarProcessamentoArquivosPorParametrosPathEmString: ");
 
         // -- 01_Cenário
-        // -- 02_Ação
         TipoExtensaoArquivo xml = TipoExtensaoArquivo.XML;
+
+        // -- 02_Ação
         ProcessarArquivoService.efetuarProcessamentoPor(pathEntrada, pathSaida, pathSaidaArquivosMovidos, xml);
 
         // -- 03_Verificação_Validação
@@ -84,8 +83,9 @@ public class ProcessarArquivoServiceTest {
         System.out.println("#TEST: deveEfetuarProcessamentoArquivosPorParametrosPathEmFile: ");
 
         // -- 01_Cenário
-        // -- 02_Ação
         TipoExtensaoArquivo xml = TipoExtensaoArquivo.XML;
+
+        // -- 02_Ação
         ProcessarArquivoService.efetuarProcessamento(filePathEntrada, filePathSaida, filePathSaidaArquivosMovidos, xml);
 
         // -- 03_Verificação_Validação

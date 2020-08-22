@@ -58,9 +58,13 @@ public class Arquivo {
     }
 
     private String getNomeArquivoCompletoDefault() {
-        return (this.nomeArquivo.contains(this.tipoExtensaoArquivo.getCodigoLiteral()))
-                ? this.nomeArquivo
-                : this.nomeArquivo.concat(".").concat(this.tipoExtensaoArquivo.getCodigoLiteral());
+        return (isParamsValidosCarregarNomeArquivoCompleto())
+                ? this.nomeArquivo.concat(".").concat(this.tipoExtensaoArquivo.getCodigoLiteral())
+                : this.nomeArquivo;
+    }
+
+    private boolean isParamsValidosCarregarNomeArquivoCompleto() {
+        return (Objects.nonNull(tipoExtensaoArquivo) && !this.nomeArquivo.contains(this.tipoExtensaoArquivo.getCodigoLiteral()));
     }
 
     private String getNomeArquivoCompletoRandomico() {
