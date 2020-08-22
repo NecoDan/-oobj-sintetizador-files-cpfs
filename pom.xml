@@ -47,6 +47,12 @@
             <version>3.16.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.6.0</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- Apache Commons Complete Util -->
         <dependency>
@@ -70,7 +76,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>br.com.oobj.sintetizador.files.cpfs.app.App</mainClass>
+                            <mainClass>br.com.oobj.sintetizador.files.cpfs.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

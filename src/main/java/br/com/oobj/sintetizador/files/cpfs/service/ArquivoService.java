@@ -55,7 +55,7 @@ public class ArquivoService implements IArquivoService {
 
     @Override
     public void efetuarProcessamentosArquivos(List<Arquivo> arquivoList, PropriedadeArquivos propriedadeArquivos) throws ServiceException {
-        if (arquivoList.isEmpty())
+        if (Objects.isNull(arquivoList) || arquivoList.isEmpty())
             throw new ServiceException("Não existem arquivos a serem processados.");
 
         List<Arquivo> arquivosListUnica = getListaArquivosUnica(arquivoList);
