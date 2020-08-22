@@ -2,8 +2,6 @@ package br.com.oobj.sintetizador.files.cpfs.repository;
 
 import br.com.oobj.sintetizador.files.cpfs.model.Arquivo;
 import br.com.oobj.sintetizador.files.cpfs.model.PropriedadeArquivos;
-import br.com.oobj.sintetizador.files.cpfs.model.TipoExtensaoArquivo;
-import br.com.oobj.sintetizador.files.cpfs.utils.ArquivoUtil;
 import br.com.oobj.sintetizador.files.cpfs.utils.exceptions.RepositoryException;
 import br.com.oobj.sintetizador.files.cpfs.validation.IValidadorProcessamentoService;
 import br.com.oobj.sintetizador.files.cpfs.validation.ValidadorProcessamentoService;
@@ -12,8 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static br.com.oobj.sintetizador.files.cpfs.utils.ArquivoUtil.*;
 
@@ -32,36 +28,10 @@ public class ArquivoRepository implements IArquivoRepository {
         return fileInputDatList;
     }
 
-    @Override
-    public List<Arquivo> findAllArquivosPathDestino(PropriedadeArquivos propriedadeArquivos) throws RepositoryException {
-        TipoExtensaoArquivo tipoExtensaoArquivo = propriedadeArquivos.getTipoExtensaoArquivo();
-        List<File> fileInputDatList = procurar(propriedadeArquivos.getPathDestinoPadrao(), tipoExtensaoArquivo.getCodigoLiteral());
-        this.validadorProcessamentoService.validarContemArquivosObtidosFileDiretorioPadraoEntrada(fileInputDatList);
-        return getArquivosFromFileInputList(fileInputDatList, tipoExtensaoArquivo);
-    }
-
-    private List<Arquivo> getArquivosFromFileInputList(List<File> fileInputDatList, TipoExtensaoArquivo tipoExtensaoArquivo) {
-        return fileInputDatList.stream()
-                .filter(Objects::nonNull)
-                .filter(ArquivoUtil::isFileValido)
-                .filter(f -> ArquivoUtil.isNameArquivoContainsNumeroCpf(f, tipoExtensaoArquivo.getCodigoLiteral()))
-                .map(file -> mountArquivoFromFile(file, tipoExtensaoArquivo))
-                .collect(Collectors.toList());
-    }
-
-    private Arquivo mountArquivoFromFile(File file, TipoExtensaoArquivo tipoExtensaoArquivo) {
-        return Arquivo.builder()
-                .caminho(file.getAbsolutePath())
-                .tipoExtensaoArquivo(tipoExtensaoArquivo)
-                .build()
-                .geraNomeArquivo(file)
-                .geraConteudoArquivo(file);
-    }
-
     private List<File> procurar(File filePathInputDefault, String extensaoArquivoBusca) {
         return (validadorProcessamentoService.isNotContainsArquivosDiretorioPadraoEntrada(filePathInputDefault))
                 ? Collections.emptyList()
-                : buscarListaFilesNovo(filePathInputDefault, extensaoArquivoBusca);
+                : buscarListaFiles(filePathInputDefault, extensaoArquivoBusca);
     }
 
     @Override
@@ -87,7 +57,8 @@ public class ArquivoRepository implements IArquivoRepository {
         return new File(filePathOuPutSave.getAbsolutePath().concat("/").concat(nomeArquivo));
     }
 
-    private void salvar(String conteudoArquivo, File arquivoNovo) throws RepositoryException {
+    @Override
+    public void salvar(String conteudoArquivo, File arquivoNovo) throws RepositoryException {
         try {
             gravarArquivo(conteudoArquivo, arquivoNovo);
         } catch (IOException e) {

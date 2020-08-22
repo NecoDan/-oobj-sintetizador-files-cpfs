@@ -13,7 +13,7 @@ public final class RandomicoUtil {
         return new Random();
     }
 
-    private static int gerarValorRandomico() {
+    public static int gerarValorRandomico() {
         int min = 1;
         return min + getRandom().nextInt(LIMITE_MAX_RANDOMICO_INTEIRO);
     }

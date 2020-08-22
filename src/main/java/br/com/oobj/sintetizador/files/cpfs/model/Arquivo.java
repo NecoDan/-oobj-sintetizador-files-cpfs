@@ -22,16 +22,15 @@ public class Arquivo {
     private TipoExtensaoArquivo tipoExtensaoArquivo;
 
     public void gerarNomeArquivo(File file) {
-        if (isParametersInvalidosAoEfetuarGeracao(file) || !this.nomeArquivo.isEmpty())
+        if (Objects.isNull(file) || Objects.nonNull(this.nomeArquivo) && !this.nomeArquivo.isEmpty())
             return;
         this.nomeArquivo = file.getName().replace("." + this.tipoExtensaoArquivo.getCodigoLiteral(), "");
         this.nomeArquivo = this.nomeArquivo + "." + this.tipoExtensaoArquivo.getCodigoLiteral();
     }
 
     public void gerarConteudoArquivo(File file) {
-        if (isParametersInvalidosAoEfetuarGeracao(file) || !this.conteudo.isEmpty())
+        if (Objects.isNull(file) || Objects.nonNull(this.conteudo) && !this.conteudo.isEmpty())
             return;
-
         gerarNomeArquivo(file);
         this.conteudo = this.nomeArquivo;
     }
@@ -59,7 +58,9 @@ public class Arquivo {
     }
 
     private String getNomeArquivoCompletoDefault() {
-        return (this.nomeArquivo.concat(".").concat(this.tipoExtensaoArquivo.getCodigoLiteral()));
+        return (this.nomeArquivo.contains(this.tipoExtensaoArquivo.getCodigoLiteral()))
+                ? this.nomeArquivo
+                : this.nomeArquivo.concat(".").concat(this.tipoExtensaoArquivo.getCodigoLiteral());
     }
 
     private String getNomeArquivoCompletoRandomico() {
@@ -67,10 +68,10 @@ public class Arquivo {
     }
 
     private boolean isPathCaminhoInvalido(File file) {
-        return (Objects.isNull(file) || ArquivoUtil.isFileDiretorioInValido(file));
+        return (Objects.isNull(file) || ArquivoUtil.isFileInValido(file));
     }
 
-    private boolean isParametersInvalidosAoEfetuarGeracao(File file) {
+    private boolean isParametersFileInvalidos(File file) {
         return (isPathCaminhoInvalido(file) || Objects.isNull(this.tipoExtensaoArquivo));
     }
 

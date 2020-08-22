@@ -4,12 +4,10 @@ import br.com.oobj.sintetizador.files.cpfs.model.Arquivo;
 import br.com.oobj.sintetizador.files.cpfs.model.PropriedadeArquivos;
 import br.com.oobj.sintetizador.files.cpfs.repository.ArquivoRepository;
 import br.com.oobj.sintetizador.files.cpfs.repository.IArquivoRepository;
-import br.com.oobj.sintetizador.files.cpfs.utils.ArquivoUtil;
 import br.com.oobj.sintetizador.files.cpfs.utils.exceptions.RepositoryException;
 import br.com.oobj.sintetizador.files.cpfs.utils.exceptions.ServiceException;
 import br.com.oobj.sintetizador.files.cpfs.validation.IValidadorProcessamentoService;
 import br.com.oobj.sintetizador.files.cpfs.validation.ValidadorProcessamentoService;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -33,17 +31,8 @@ public class ArquivoService implements IArquivoService {
     @Override
     public List<File> recuperarArquivosFromPathEntrada(PropriedadeArquivos propriedadeArquivos) throws ServiceException {
         try {
-            return this.arquivoRepository.findAllFiles(propriedadeArquivos);
-        } catch (RepositoryException e) {
-            throw new ServiceException(e.getLocalizedMessage());
-        }
-    }
-
-    @Override
-    public List<Arquivo> recuperarArquivosFromPathDestino(PropriedadeArquivos propriedadeArquivos) throws ServiceException {
-        try {
             this.validadorProcessamentoService.validarPropriedadesArquivo(propriedadeArquivos);
-            return this.arquivoRepository.findAllArquivosPathDestino(propriedadeArquivos);
+            return this.arquivoRepository.findAllFiles(propriedadeArquivos);
         } catch (RepositoryException e) {
             throw new ServiceException(e.getLocalizedMessage());
         }
@@ -69,37 +58,35 @@ public class ArquivoService implements IArquivoService {
         if (arquivoList.isEmpty())
             throw new ServiceException("Não existem arquivos a serem processados.");
 
-        String extensaoArquivoFilter = propriedadeArquivos.getTipoExtensaoArquivo().getCodigoLiteral();
+        List<Arquivo> arquivosListUnica = getListaArquivosUnica(arquivoList);
+        salvarEmLote(arquivosListUnica);
 
-        List<String> outputList = ArquivoUtil.buscarListaFilesNovo(propriedadeArquivos.getPathDestinoPadrao(), extensaoArquivoFilter)
-                .stream()
-                .map(File::getName)
-                .collect(Collectors.toList());
-
-        List<String> inputList = getListNamesInputFromListFiles(arquivoList);
-
-        salvarListArquivos(arquivoList);
-        moverListArquivosExistentensDiretorioPadraoSaida(propriedadeArquivos, inputList, outputList);
+        List<String> inputList = getListNamesInputFromListFiles(arquivosListUnica);
+        moverListArquivosExistentensDiretorioPadraoSaida(propriedadeArquivos, inputList);
     }
 
-    private void moverListArquivosExistentensDiretorioPadraoSaida(PropriedadeArquivos propriedadeArquivos, List<String> input, List<String> output) {
-        Collection<String> strListIntersection = CollectionUtils.intersection(input, output);
-
-        strListIntersection.forEach(strNomeArquivo -> {
+    private void moverListArquivosExistentensDiretorioPadraoSaida(PropriedadeArquivos propriedadeArquivos, List<String> inputList) {
+        inputList.forEach(strNomeArquivo -> {
             try {
-                FileUtils.moveFile(
-                        new File(propriedadeArquivos.getPathDestinoPadrao().getAbsolutePath().concat("/") + strNomeArquivo),
-                        new File(propriedadeArquivos.getPathDestinoArquivoAMover().getAbsolutePath().concat("/") + strNomeArquivo)
-                );
+                moverArquivoFrom(strNomeArquivo, propriedadeArquivos);
             } catch (IOException e) {
+                System.out.println(e.getLocalizedMessage());
                 throw new RuntimeException(e.getLocalizedMessage());
             }
         });
     }
 
-    private void salvarListArquivos(List<Arquivo> arquivoList) throws ServiceException {
-        List<Arquivo> arquivosListUnica = getListaArquivosUnica(arquivoList);
-        salvarEmLote(arquivosListUnica);
+    private void moverArquivoFrom(String strNomeArquivo, PropriedadeArquivos propriedadeArquivos) throws IOException {
+        File fileExists = new File(propriedadeArquivos.getPathDestinoPadrao().getAbsolutePath().concat("/") + strNomeArquivo);
+        File fileMove = new File(propriedadeArquivos.getPathDestinoArquivoAMover().getAbsolutePath().concat("/") + strNomeArquivo);
+
+        if (!fileMove.exists()) {
+            FileUtils.moveFile(fileExists, fileMove);
+            return;
+        }
+
+        FileUtils.forceDelete(fileMove);
+        FileUtils.moveFile(fileExists, fileMove);
     }
 
     private List<String> getListNamesInputFromListFiles(List<Arquivo> arquivoList) {

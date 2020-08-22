@@ -2,9 +2,9 @@ package br.com.oobj.sintetizador.files.cpfs.utils;
 
 import java.util.InputMismatchException;
 
-public final class CPFUtil {
+public final class CpfUtil {
 
-    private CPFUtil() {
+    private CpfUtil() {
 
     }
 

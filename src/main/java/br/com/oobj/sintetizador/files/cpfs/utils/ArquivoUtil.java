@@ -17,11 +17,11 @@ public final class ArquivoUtil {
     }
 
     public static boolean isNotContainsArquivosFileDiretorio(File file) {
-        return (Objects.isNull(file.listFiles()) || (Objects.nonNull(file.listFiles()) && Objects.requireNonNull(file.listFiles()).length == 0));
+        return (isFileInValido(file) || Objects.isNull(file.listFiles()) || (Objects.nonNull(file.listFiles()) && Objects.requireNonNull(file.listFiles()).length == 0));
     }
 
     public static boolean isFileDiretorioInValido(File file) {
-        return (!file.exists() || !file.isDirectory() || !file.canRead());
+        return (isFileInValido(file) || !file.exists() || !file.isDirectory() || !file.canRead());
     }
 
     public static boolean isFileDiretorioValido(File file) {
@@ -29,11 +29,11 @@ public final class ArquivoUtil {
     }
 
     public static boolean isFileInValido(File file) {
-        return (!isFileValido(file));
+        return (Objects.equals(false, isFileValido(file)));
     }
 
     public static boolean isFileValido(File file) {
-        return (file.exists() && file.canRead());
+        return (Objects.nonNull(file) && file.exists() && file.canRead());
     }
 
     public static boolean isNameArquivoContainsNumeroCpf(File file, String extensaoArquivo) {
@@ -46,10 +46,10 @@ public final class ArquivoUtil {
 
     private static boolean isValidarNameArquivoContainsNumeroCpf(File file, String extensaoArquivo) {
         String numeroCpf = file.getName().replace("." + extensaoArquivo, "");
-        return CPFUtil.isCPFValido(numeroCpf);
+        return CpfUtil.isCPFValido(numeroCpf);
     }
 
-    public static List<File> buscarListaFilesNovo(File filePath, String extensaoArquivoFiltro) {
+    public static List<File> buscarListaFiles(File filePath, String extensaoArquivoFiltro) {
         return (List<File>) ((isNotContainsExtensaoComoFiltroBusca(extensaoArquivoFiltro))
                 ? FileUtils.listFiles(filePath, FileFilterUtils.fileFileFilter(), null)
                 : FileUtils.listFiles(filePath, FileFilterUtils.suffixFileFilter(extensaoArquivoFiltro), null));
@@ -83,14 +83,16 @@ public final class ArquivoUtil {
             fileWriter.flush();
         }
     }
-    
+
     public static File gerarDiretorioPadraoArquivosSaidaAPartirSistema() {
         File filePathDiretorioSaidaSistema = new File(System.getProperty("user.home") + PATH_DEFAULT_SAIDA);
         return (filePathDiretorioSaidaSistema.exists()) ? filePathDiretorioSaidaSistema : criarPathDiretorioInexistente(filePathDiretorioSaidaSistema);
     }
 
-    private static File criarPathDiretorioInexistente(File filePathDiretorio) {
-        boolean created = filePathDiretorio.mkdir();
-        return (created) ? filePathDiretorio : null;
+    public static File criarPathDiretorioInexistente(File filePathDiretorio) {
+        if (!filePathDiretorio.exists()) {
+            filePathDiretorio.mkdir();
+        }
+        return filePathDiretorio;
     }
 }

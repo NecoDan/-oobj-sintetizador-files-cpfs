@@ -9,13 +9,11 @@ import java.util.List;
 
 public interface IArquivoService {
 
-    List<File> recuperarArquivosFromPathEntrada(PropriedadeArquivos propriedadeArquivos) throws ServiceException;
+    void efetuarProcessamentosArquivos(List<Arquivo> arquivoList, PropriedadeArquivos propriedadeArquivos) throws ServiceException;
 
-    List<Arquivo> recuperarArquivosFromPathDestino(PropriedadeArquivos propriedadeArquivos) throws ServiceException;
+    List<File> recuperarArquivosFromPathEntrada(PropriedadeArquivos propriedadeArquivos) throws ServiceException;
 
     void salvarEmLote(List<Arquivo> arquivoList) throws ServiceException;
 
     void salvar(Arquivo arquivo) throws ServiceException;
-
-    void efetuarProcessamentosArquivos(List<Arquivo> arquivoList, PropriedadeArquivos propriedadeArquivos) throws ServiceException;
 }

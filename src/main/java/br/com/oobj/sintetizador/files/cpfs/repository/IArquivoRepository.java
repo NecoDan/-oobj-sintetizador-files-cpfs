@@ -11,9 +11,9 @@ public interface IArquivoRepository {
 
     List<File> findAllFiles(PropriedadeArquivos propriedadeArquivos) throws RepositoryException;
 
-    List<Arquivo> findAllArquivosPathDestino(PropriedadeArquivos propriedadeArquivos) throws RepositoryException;
-
     void saveArquivo(Arquivo arquivo) throws RepositoryException;
 
     File mountFileFrom(Arquivo arquivo);
+
+    void salvar(String conteudoArquivo, File arquivoNovo) throws RepositoryException;
 }
